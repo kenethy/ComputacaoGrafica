@@ -28,10 +28,10 @@ public class Pixels extends Canvas {
 
 		for (int x = 0; x < this.height; x++) {
 			for (int y = 0; y < this.width; y++) {
-				if (this.pixels[x][y] == 'P')
-					g.setColor(black);
-				else
+				if (this.pixels[x][y] == 'B')
 					g.setColor(white);
+				else
+					g.setColor(black);
 				g.drawLine(y, x, y, x);
 			}
 		}

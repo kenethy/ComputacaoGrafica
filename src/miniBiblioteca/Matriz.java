@@ -49,5 +49,6 @@ public class Matriz {
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 }
