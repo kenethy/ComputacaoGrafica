@@ -6,92 +6,91 @@ public class Scanline {
 
 	public static void scanline(int kTriangulos, Matriz coordTela, int[][] index, char[][] frame, int resX, int resY) {
 
-		char[][] tela = frame;
 		float aMin, aMax;
-		float xMinAux = 0;
-		float xMaxAux = 0;
-		float xMedAux = 0;
-		int indiceYMin = 0;
-		int indiceYMax = 0;
+		float xMax;
+		float xMin;
+		float xMed;
 
 		for (int i = 0; i < kTriangulos; i++) {
-			float yMax = Float.MIN_VALUE;
-			float yMin = Float.MAX_VALUE;
-			float xMax = Float.MIN_VALUE;
-			float xMin = Float.MAX_VALUE;
-			float yMed = 0;
-			float xMed = 0;
-
+			
 			/**
 			 * VERIFICAÇÃO DOS MAXIMOS E MINIMOS Y
 			 */
-			for (int j = 0; j < 3; j++) {
 
-				if (yMax < coordTela.getMatriz()[index[i][j] - 1][1]) {
-					yMax = coordTela.getMatriz()[index[i][j] - 1][1];
-					indiceYMax = index[i][j];
-				}
+			float[] vertexMax = coordTela.getMatriz()[index[i][0] - 1];
+			float[] vertexMed = coordTela.getMatriz()[index[i][1] - 1];
+			float[] vertexMin = coordTela.getMatriz()[index[i][2] - 1];
 
-				else if (yMin > coordTela.getMatriz()[index[i][j] - 1][1]) {
-					yMin = coordTela.getMatriz()[index[i][j] - 1][1];
-					indiceYMin = index[i][j];
-				}
-
-				if (xMax < coordTela.getMatriz()[index[i][j] - 1][0])
-					xMax = coordTela.getMatriz()[index[i][j] - 1][0];
-
-				else if (xMin > coordTela.getMatriz()[index[i][j] - 1][0])
-					xMin = coordTela.getMatriz()[index[i][j] - 1][0];
+			if (vertexMax[1] < vertexMed[1]) {
+				float[] aux = vertexMax;
+				vertexMax = vertexMed;
+				vertexMed = aux;
 			}
 
-			for (int j = 0; j < 3; j++) {
-				if (indiceYMin != index[i][j] - 1 && indiceYMax != index[i][j] - 1) {
-					yMed = coordTela.getMatriz()[index[i][j] - 1][1];
-					xMed = coordTela.getMatriz()[index[i][j] - 1][0];
-				}
+			if (vertexMax[1] < vertexMin[1]) {
+				float[] aux = vertexMax;
+				vertexMax = vertexMin;
+				vertexMin = aux;
 			}
 
-			if (xMed >= xMin) {
-				aMax = (yMed - yMax) / (xMed - xMax);
-				aMin = (yMin - yMax) / (xMin - xMax);
+			if (vertexMed[1] < vertexMin[1]) {
+				float[] aux = vertexMed;
+				vertexMed = vertexMin;
+				vertexMin = aux;
+			}
+
+			if (vertexMed[0] >= vertexMin[0]) {
+				aMax = (vertexMed[1] - vertexMax[1]) / (vertexMed[0] - vertexMax[0]);
+				aMin = (vertexMin[1] - vertexMax[1]) / (vertexMin[0] - vertexMax[0]);
 			} else {
-				aMin = (yMed - yMax) / (xMed - xMax);
-				aMax = (yMin - yMax) / (xMin - xMax);
+				aMin = (vertexMed[1] - vertexMax[1]) / (vertexMed[0] - vertexMax[0]);
+				aMax = (vertexMin[1] - vertexMax[1]) / (vertexMin[0] - vertexMax[0]);
 			}
 
-			xMinAux = xMax;
-			xMaxAux = xMax;
+			xMin = vertexMax[0];
+			xMax = xMin;
+			xMed = xMin;
 
-			if (yMax > resY)
-				yMax = resY - 1;
+			for (float yScan = vertexMax[1]; yScan >= vertexMed[1]; --yScan) {
+				if (xMin < 0 || xMin >= resX || xMin >= resY || xMax < 0 || xMax >= resX || xMax >= resY || yScan < 0
+						|| yScan >= resX || yScan >= resY)
+					break;
 
-			for (float yScan = yMax; yScan > yMed; yScan--) {
-				for (xMedAux = xMinAux; xMedAux <= xMaxAux; xMedAux++) {
-					tela[(int) yScan][(int) xMedAux] = 'B';
+				while (xMed <= xMax) {
+					frame[(int) yScan][(int) xMed] = 'B';
+					++xMed;
 				}
 
-				xMinAux += (1 / aMin);
-				xMaxAux += (1 / aMax);
+				xMin -= (1.0 / aMin);
+				xMax -= (1.0 / aMax);
+				xMed = xMin;
 			}
 
-			if (xMed > xMin) {
-				aMax = (yMed - yMin) / (xMed - xMin);
-				aMin = (yMax - yMin) / (xMax - xMin);
+			if (vertexMed[0] >= vertexMin[0]) {
+				aMax = (vertexMed[1] - vertexMin[1]) / (vertexMed[0] - vertexMin[0]);
+				aMin = (vertexMax[1] - vertexMin[1]) / (vertexMax[0] - vertexMin[0]);
 			} else {
-				aMin = (yMed - yMin) / (xMed - xMin);
-				aMax = (yMax - yMin) / (xMax - xMin);
+				aMin = (vertexMed[1] - vertexMin[1]) / (vertexMed[0] - vertexMin[0]);
+				aMax = (vertexMax[1] - vertexMin[1]) / (vertexMax[0] - vertexMin[0]);
 			}
 
-			xMinAux = xMin;
-			xMaxAux = xMin;
+			xMin = vertexMin[0];
+			xMax = xMin;
+			xMed = xMin;
 
-			for (float j = yMin; j < yMed; j++) {
-				for (xMedAux = xMinAux; xMedAux <= xMaxAux && xMedAux < resX; xMedAux++) {
-					tela[(int) j][(int) xMedAux] = 'B';
+			for (float yScan = vertexMin[1]; yScan <= vertexMed[1]; ++yScan) {
+				if (xMin < 0 || xMin >= resX || xMin >= resY || xMax < 0 || xMax >= resX || xMax >= resY || yScan < 0
+						|| yScan >= resX || yScan >= resY)
+					break;
+
+				while (xMed <= xMax) {
+					frame[(int) yScan][(int) xMed] = 'B';
+					++xMed;
 				}
 
-				xMinAux += (1 / aMin);
-				xMaxAux += (1 / aMax);
+				xMin += (1.0 / aMin);
+				xMax += (1.0 / aMax);
+				xMed = xMin;
 			}
 		}
 	}

@@ -195,11 +195,11 @@ public class Malha {
 			 */
 			Matriz coordTela = new Matriz(nVertices, 2);
 			for (int i = 0; i < nVertices; i++) {
-				coordTela.getMatriz()[i][0] = (int) (((projecao.getMatriz()[i][0] + 1) / 2) * W + 0.5);
-				coordTela.getMatriz()[i][1] = (int) (H - ((projecao.getMatriz()[i][1] + 1) / 2) * H + 0.5);
+				coordTela.getMatriz()[i][0] = (int) (((projecao.getMatriz()[i][0] + 1) / 2.0) * W + 0.5);
+				coordTela.getMatriz()[i][1] = (int) (H - ((projecao.getMatriz()[i][1] + 1) / 2.0) * H + 0.5);
 			}
 
-			// coordTela.print();
+			//coordTela.print();
 
 			/**
 			 * PINTAR PIXELS DAS COORDENADAS DE TELA
@@ -213,7 +213,7 @@ public class Malha {
 					}
 				}
 			}
-			
+
 			JFrame frame = new JFrame("tela");
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.setSize(H + 50, W + 50);
@@ -227,7 +227,6 @@ public class Malha {
 
 			char[][] tela2 = new char[H][W];
 			Scanline.scanline(kTriangulos, coordTela, indices, tela2, W, H);
-
 
 			JFrame frame2 = new JFrame("tela2");
 			frame2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
