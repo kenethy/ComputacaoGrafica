@@ -47,7 +47,7 @@ public class Malha {
 		/**
 		 * LARGURA DEFINIDA EM 320 X 320
 		 */
-		int H = 600;
+		int H = 540;
 		int W = 600;
 
 		String str = in.readLine();
@@ -213,25 +213,25 @@ public class Malha {
 					}
 				}
 			}
+			
+			JFrame frame = new JFrame("tela");
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			frame.setSize(H + 50, W + 50);
+			frame.add(new Pixels(H, W, tela));
+			frame.setLocationRelativeTo(null);
+			frame.setVisible(true);
 
 			/**
 			 * RASTERIZAR CADA TRIANGULO USANDO SCANLINE
 			 */
 
 			char[][] tela2 = new char[H][W];
-			;
-			Scanline.scanline(kTriangulos, coordTela, indices, tela2, H, W);
+			Scanline.scanline(kTriangulos, coordTela, indices, tela2, W, H);
 
-			JFrame frame = new JFrame("tela");
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			frame.setSize(H + 100, W + 100);
-			frame.add(new Pixels(H, W, tela));
-			frame.setLocationRelativeTo(null);
-			frame.setVisible(true);
 
 			JFrame frame2 = new JFrame("tela2");
 			frame2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			frame2.setSize(H + 100, W + 100);
+			frame2.setSize(H + 10, W + 10);
 			frame2.add(new Pixels(H, W, tela2));
 			frame2.setLocationRelativeTo(null);
 			frame2.setVisible(true);

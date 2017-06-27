@@ -62,7 +62,10 @@ public class Scanline {
 			xMinAux = xMax;
 			xMaxAux = xMax;
 
-			for (float yScan = yMax; yScan >= yMed; yScan--) {
+			if (yMax > resY)
+				yMax = resY - 1;
+
+			for (float yScan = yMax; yScan > yMed; yScan--) {
 				for (xMedAux = xMinAux; xMedAux <= xMaxAux; xMedAux++) {
 					tela[(int) yScan][(int) xMedAux] = 'B';
 				}
@@ -83,14 +86,13 @@ public class Scanline {
 			xMaxAux = xMin;
 
 			for (float j = yMin; j < yMed; j++) {
-				for (xMedAux = xMinAux; xMedAux <= xMax; xMedAux++) {
+				for (xMedAux = xMinAux; xMedAux <= xMaxAux && xMedAux < resX; xMedAux++) {
 					tela[(int) j][(int) xMedAux] = 'B';
 				}
 
 				xMinAux += (1 / aMin);
 				xMaxAux += (1 / aMax);
 			}
-
 		}
 	}
 }
