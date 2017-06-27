@@ -4,13 +4,13 @@ import miniBiblioteca.Matriz;
 
 public class Scanline {
 
-	public static char[][] scanline(int kTriangulos, Matriz coordTela, int[][] index, char[][] frame, int resX,
-			int resY) {
+	public static void scanline(int kTriangulos, Matriz coordTela, int[][] index, char[][] frame, int resX, int resY) {
 
 		char[][] tela = frame;
 		float aMin, aMax;
 		float xMinAux = 0;
 		float xMaxAux = 0;
+		float xMedAux = 0;
 		int indiceYMin = 0;
 		int indiceYMax = 0;
 
@@ -32,7 +32,7 @@ public class Scanline {
 					indiceYMax = index[i][j];
 				}
 
-				if (yMin > coordTela.getMatriz()[index[i][j] - 1][1]) {
+				else if (yMin > coordTela.getMatriz()[index[i][j] - 1][1]) {
 					yMin = coordTela.getMatriz()[index[i][j] - 1][1];
 					indiceYMin = index[i][j];
 				}
@@ -40,7 +40,7 @@ public class Scanline {
 				if (xMax < coordTela.getMatriz()[index[i][j] - 1][0])
 					xMax = coordTela.getMatriz()[index[i][j] - 1][0];
 
-				if (xMin > coordTela.getMatriz()[index[i][j] - 1][0])
+				else if (xMin > coordTela.getMatriz()[index[i][j] - 1][0])
 					xMin = coordTela.getMatriz()[index[i][j] - 1][0];
 			}
 
@@ -51,43 +51,46 @@ public class Scanline {
 				}
 			}
 
-//			System.out.println(yMax + " " + yMin + " " + yMed);
-//			System.out.println(xMax + " " + xMin + " " + xMed);
-//			System.out.println();
+			if (xMed >= xMin) {
+				aMax = (yMed - yMax) / (xMed - xMax);
+				aMin = (yMin - yMax) / (xMin - xMax);
+			} else {
+				aMin = (yMed - yMax) / (xMed - xMax);
+				aMax = (yMin - yMax) / (xMin - xMax);
+			}
 
-			aMin = (yMed - yMax) / (xMed - xMax);
-			aMax = (yMin - yMax) / (xMin - xMax);
-			xMinAux = xMin;
+			xMinAux = xMax;
 			xMaxAux = xMax;
 
-//			System.out.println(yMax + " " + yMin + " " + yMed);
-//			System.out.println(xMax + " " + xMin + " " + xMed);
-//			System.out.println();
-	
-			/*
-			for (int j = (int) yMax; j > yMed; j--) {
-				if (j > resX)
-					j = resX - 1;
-
-				for (int k = (int) xMin; k < xMaxAux && k < resY; k++) {
-					tela[j][k] = 'B';
-					xMinAux = 1 / aMin + xMinAux;
+			for (float yScan = yMax; yScan >= yMed; yScan--) {
+				for (xMedAux = xMinAux; xMedAux <= xMaxAux; xMedAux++) {
+					tela[(int) yScan][(int) xMedAux] = 'B';
 				}
-				xMaxAux = 1 / aMax + xMaxAux;
+
+				xMinAux += (1 / aMin);
+				xMaxAux += (1 / aMax);
+			}
+
+			if (xMed > xMin) {
+				aMax = (yMed - yMin) / (xMed - xMin);
+				aMin = (yMax - yMin) / (xMax - xMin);
+			} else {
+				aMin = (yMed - yMin) / (xMed - xMin);
+				aMax = (yMax - yMin) / (xMax - xMin);
 			}
 
 			xMinAux = xMin;
-			xMaxAux = xMax;
+			xMaxAux = xMin;
 
-			for (int j = (int) yMin; j < yMed && j < resX; j++) {
-				for (int k = (int) xMin; k < xMaxAux && k < resY; k++) {
-					tela[j][k] = 'B';
-					xMinAux = 1 / aMin + xMinAux;
+			for (float j = yMin; j < yMed; j++) {
+				for (xMedAux = xMinAux; xMedAux <= xMax; xMedAux++) {
+					tela[(int) j][(int) xMedAux] = 'B';
 				}
-				xMaxAux = 1 / aMax + xMaxAux;
+
+				xMinAux += (1 / aMin);
+				xMaxAux += (1 / aMax);
 			}
-			*/
+
 		}
-		return tela;
 	}
 }

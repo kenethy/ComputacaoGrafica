@@ -47,8 +47,8 @@ public class Malha {
 		/**
 		 * LARGURA DEFINIDA EM 320 X 320
 		 */
-		int H = 320;
-		int W = 320;
+		int H = 600;
+		int W = 600;
 
 		String str = in.readLine();
 		String[] values = str.split(" ");
@@ -104,16 +104,6 @@ public class Malha {
 			}
 		}
 
-		// for (int i = 0; i < H; i++) {
-		// for (int j = 0; j < W; j++) {
-		// for (int k = 0; k < nVertices; k++) {
-		// if (i == coordNorm[k][0] && j == coordNorm[k][1]) {
-		// tela[i][j] = 'B';
-		// }
-		// }
-		// }
-		// }
-
 		CameraVirtual cv = new CameraVirtual();
 		int key;
 		cv.load();
@@ -158,7 +148,7 @@ public class Malha {
 			matMB.setMatrizLine(1, cv.getVetorV());
 			matMB.setMatrizLine(2, cv.getVetorN());
 
-			//matMB.print();
+			// matMB.print();
 
 			/**
 			 * PARA CADA TRIANGULO REALIZAR MUDANÇA MUNDIAL PARA VISTA
@@ -179,8 +169,8 @@ public class Malha {
 
 				pontos.setMatrizLine(i, new Vetor(M.getMatriz()[0][0], M.getMatriz()[1][0], M.getMatriz()[2][0]));
 			}
-			
-			//pontos.print();
+
+			// pontos.print();
 
 			/**
 			 * PROJEÇÃO EM PERSPECTIVA
@@ -209,8 +199,8 @@ public class Malha {
 				coordTela.getMatriz()[i][1] = (int) (H - ((projecao.getMatriz()[i][1] + 1) / 2) * H + 0.5);
 			}
 
-			//coordTela.print();
-			
+			// coordTela.print();
+
 			/**
 			 * PINTAR PIXELS DAS COORDENADAS DE TELA
 			 */
@@ -223,7 +213,14 @@ public class Malha {
 					}
 				}
 			}
-			
+
+			/**
+			 * RASTERIZAR CADA TRIANGULO USANDO SCANLINE
+			 */
+
+			char[][] tela2 = new char[H][W];
+			;
+			Scanline.scanline(kTriangulos, coordTela, indices, tela2, H, W);
 
 			JFrame frame = new JFrame("tela");
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -232,11 +229,12 @@ public class Malha {
 			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
 
-			/**
-			 * RASTERIZAR CADA TRIANGULO USANDO SCANLINE
-			 */
-
-			char[][] tela2 = Scanline.scanline(kTriangulos, coordTela, indices, tela, H, W);
+			JFrame frame2 = new JFrame("tela2");
+			frame2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			frame2.setSize(H + 100, W + 100);
+			frame2.add(new Pixels(H, W, tela2));
+			frame2.setLocationRelativeTo(null);
+			frame2.setVisible(true);
 
 			while (key != 1) {
 				System.out.println("Para recarregar o arquivo aperte 1: ");
