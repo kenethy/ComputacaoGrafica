@@ -4,93 +4,114 @@ import miniBiblioteca.Matriz;
 
 public class Scanline {
 
-	public static void scanline(int kTriangulos, Matriz coordTela, int[][] index, char[][] frame, int resX, int resY) {
+	public static void scanline(int kTriangulos, Matriz coordTela, int[][] index, char[][] frame, int resolucaoX,
+			int resolucaoY) {
 
-		float aMin, aMax;
-		float xMax;
-		float xMin;
-		float xMed;
+		float aMinimo, aMaximo;
+		float xMaximo;
+		float xMinimo;
+		float xMedio;
 
 		for (int i = 0; i < kTriangulos; i++) {
-			
+
 			/**
 			 * VERIFICAÇÃO DOS MAXIMOS E MINIMOS Y
 			 */
 
-			float[] vertexMax = coordTela.getMatriz()[index[i][0] - 1];
-			float[] vertexMed = coordTela.getMatriz()[index[i][1] - 1];
-			float[] vertexMin = coordTela.getMatriz()[index[i][2] - 1];
+			float[] vertexMaximo = coordTela.getMatriz()[index[i][0] - 1];
+			float[] vertexMedio = coordTela.getMatriz()[index[i][1] - 1];
+			float[] vertexMinimo = coordTela.getMatriz()[index[i][2] - 1];
 
-			if (vertexMax[1] < vertexMed[1]) {
-				float[] aux = vertexMax;
-				vertexMax = vertexMed;
-				vertexMed = aux;
+			if (vertexMaximo[1] < vertexMedio[1]) {
+				float[] aux = vertexMaximo;
+				vertexMaximo = vertexMedio;
+				vertexMedio = aux;
 			}
 
-			if (vertexMax[1] < vertexMin[1]) {
-				float[] aux = vertexMax;
-				vertexMax = vertexMin;
-				vertexMin = aux;
+			if (vertexMaximo[1] < vertexMinimo[1]) {
+				float[] aux = vertexMaximo;
+				vertexMaximo = vertexMinimo;
+				vertexMinimo = aux;
 			}
 
-			if (vertexMed[1] < vertexMin[1]) {
-				float[] aux = vertexMed;
-				vertexMed = vertexMin;
-				vertexMin = aux;
+			if (vertexMedio[1] < vertexMinimo[1]) {
+				float[] aux = vertexMedio;
+				vertexMedio = vertexMinimo;
+				vertexMinimo = aux;
 			}
 
-			if (vertexMed[0] >= vertexMin[0]) {
-				aMax = (vertexMed[1] - vertexMax[1]) / (vertexMed[0] - vertexMax[0]);
-				aMin = (vertexMin[1] - vertexMax[1]) / (vertexMin[0] - vertexMax[0]);
+			/**
+			 * 
+			 */
+			if (vertexMedio[0] >= vertexMinimo[0]) {
+				aMaximo = (vertexMedio[1] - vertexMaximo[1]) / (vertexMedio[0] - vertexMaximo[0]);
+				aMinimo = (vertexMinimo[1] - vertexMaximo[1]) / (vertexMinimo[0] - vertexMaximo[0]);
 			} else {
-				aMin = (vertexMed[1] - vertexMax[1]) / (vertexMed[0] - vertexMax[0]);
-				aMax = (vertexMin[1] - vertexMax[1]) / (vertexMin[0] - vertexMax[0]);
+				aMinimo = (vertexMedio[1] - vertexMaximo[1]) / (vertexMedio[0] - vertexMaximo[0]);
+				aMaximo = (vertexMinimo[1] - vertexMaximo[1]) / (vertexMinimo[0] - vertexMaximo[0]);
 			}
 
-			xMin = vertexMax[0];
-			xMax = xMin;
-			xMed = xMin;
+			/**
+			 * 
+			 */
+			xMinimo = vertexMaximo[0];
+			xMaximo = xMinimo;
+			xMedio = xMinimo;
 
-			for (float yScan = vertexMax[1]; yScan >= vertexMed[1]; --yScan) {
-				if (xMin < 0 || xMin >= resX || xMin >= resY || xMax < 0 || xMax >= resX || xMax >= resY || yScan < 0
-						|| yScan >= resX || yScan >= resY)
+			/**
+			 * 
+			 */
+			for (float y = vertexMaximo[1]; y >= vertexMedio[1]; --y) {
+				if (xMinimo < 0 || xMinimo >= resolucaoX || xMinimo >= resolucaoY || xMaximo < 0
+						|| xMaximo >= resolucaoX || xMaximo >= resolucaoY || y < 0 || y >= resolucaoX
+						|| y >= resolucaoY)
 					break;
 
-				while (xMed <= xMax) {
-					frame[(int) yScan][(int) xMed] = 'B';
-					++xMed;
+				while (xMedio <= xMaximo) {
+					frame[(int) y][(int) xMedio] = 'B';
+					++xMedio;
 				}
 
-				xMin -= (1.0 / aMin);
-				xMax -= (1.0 / aMax);
-				xMed = xMin;
+				xMinimo -= (1.0 / aMinimo);
+				xMaximo -= (1.0 / aMaximo);
+				xMedio = xMinimo;
 			}
 
-			if (vertexMed[0] >= vertexMin[0]) {
-				aMax = (vertexMed[1] - vertexMin[1]) / (vertexMed[0] - vertexMin[0]);
-				aMin = (vertexMax[1] - vertexMin[1]) / (vertexMax[0] - vertexMin[0]);
+			/**
+			 * 
+			 */
+			if (vertexMedio[0] >= vertexMinimo[0]) {
+				aMaximo = (vertexMedio[1] - vertexMinimo[1]) / (vertexMedio[0] - vertexMinimo[0]);
+				aMinimo = (vertexMaximo[1] - vertexMinimo[1]) / (vertexMaximo[0] - vertexMinimo[0]);
 			} else {
-				aMin = (vertexMed[1] - vertexMin[1]) / (vertexMed[0] - vertexMin[0]);
-				aMax = (vertexMax[1] - vertexMin[1]) / (vertexMax[0] - vertexMin[0]);
+				aMinimo = (vertexMedio[1] - vertexMinimo[1]) / (vertexMedio[0] - vertexMinimo[0]);
+				aMaximo = (vertexMaximo[1] - vertexMinimo[1]) / (vertexMaximo[0] - vertexMinimo[0]);
 			}
 
-			xMin = vertexMin[0];
-			xMax = xMin;
-			xMed = xMin;
+			/**
+			 * 
+			 */
+			xMinimo = vertexMinimo[0];
+			xMaximo = xMinimo;
+			xMedio = xMinimo;
 
-			for (float yScan = vertexMin[1]; yScan <= vertexMed[1]; ++yScan) {
-				if (xMin < 0 || xMin >= resX || xMin >= resY || xMax < 0 || xMax >= resX || xMax >= resY || yScan < 0
-						|| yScan >= resX || yScan >= resY)
+			/**
+			 * 
+			 */
+			for (float y = vertexMinimo[1]; y <= vertexMedio[1]; ++y) {
+				if (xMinimo < 0 || xMinimo >= resolucaoX || xMinimo >= resolucaoY || xMaximo < 0
+						|| xMaximo >= resolucaoX || xMaximo >= resolucaoY || y < 0 || y >= resolucaoX
+						|| y >= resolucaoY)
 					break;
 
-				while (xMed <= xMax) {
-					frame[(int) yScan][(int) xMed] = 'B';
-					++xMed;
+				while (xMedio <= xMaximo) {
+					frame[(int) y][(int) xMedio] = 'B';
+					++xMedio;
 				}
 
-				xMin += (1.0 / aMin);
-				xMax += (1.0 / aMax);
-				xMed = xMin;
+				xMinimo += (1.0 / aMinimo);
+				xMaximo += (1.0 / aMaximo);
+				xMedio = xMinimo;
 			}
 		}
 	}
