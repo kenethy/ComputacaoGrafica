@@ -43,7 +43,7 @@ public class Scanline {
 			/**
 			 * 
 			 */
-			if (vertexMedio[0] >= vertexMinimo[0]) {
+			if (vertexMedio[0] > vertexMinimo[0]) {
 				aMaximo = (vertexMedio[1] - vertexMaximo[1]) / (vertexMedio[0] - vertexMaximo[0]);
 				aMinimo = (vertexMinimo[1] - vertexMaximo[1]) / (vertexMinimo[0] - vertexMaximo[0]);
 			} else {
@@ -68,7 +68,7 @@ public class Scanline {
 					break;
 
 				while (xMedio <= xMaximo) {
-					frame[(int) y][(int) xMedio] = 'B';
+					frame[(int) (y+0.5)][(int) (xMedio+0.5)] = 'B';
 					++xMedio;
 				}
 
@@ -98,14 +98,14 @@ public class Scanline {
 			/**
 			 * 
 			 */
-			for (float y = vertexMinimo[1]; y <= vertexMedio[1]; ++y) {
+			for (float y = vertexMinimo[1]; y < vertexMedio[1]; ++y) {
 				if (xMinimo < 0 || xMinimo >= resolucaoX || xMinimo >= resolucaoY || xMaximo < 0
 						|| xMaximo >= resolucaoX || xMaximo >= resolucaoY || y < 0 || y >= resolucaoX
 						|| y >= resolucaoY)
 					break;
 
 				while (xMedio <= xMaximo) {
-					frame[(int) y][(int) xMedio] = 'B';
+					frame[(int) (y+0.5)][(int) (xMedio+0.5)] = 'B';
 					++xMedio;
 				}
 
