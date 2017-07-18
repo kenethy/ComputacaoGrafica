@@ -220,13 +220,13 @@ public class Malha {
 			frame.add(new Pixels(H, W, tela));
 			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
-
+			
 			/**
 			 * RASTERIZAR CADA TRIANGULO USANDO SCANLINE
 			 */
 
 			char[][] tela2 = new char[H][W];
-			Scanline.scanline(kTriangulos, coordTela, indices, tela2, W, H);
+			Scanline.scanline(kTriangulos, coordTela, indices, tela2, W, H, cv);
 
 			JFrame frame2 = new JFrame("Rasterização com Scanline");
 			frame2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
