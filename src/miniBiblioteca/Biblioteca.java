@@ -37,8 +37,8 @@ public class Biblioteca {
 	}
 
 	/**
-	 * SUBTRAÇÃO DE PONTOS 3D (RETORNA UM VETOR 3D)
-	 * COORDENADAS (XB - XA, YB - YA, ZB - ZA)
+	 * SUBTRAÇÃO DE PONTOS 3D (RETORNA UM VETOR 3D) COORDENADAS (XB - XA, YB -
+	 * YA, ZB - ZA)
 	 */
 	public static Vetor subPontos(Ponto A, Ponto B) {
 		Vetor v = new Vetor(B.getX() - A.getX(), B.getY() - A.getY(), B.getZ() - A.getZ());

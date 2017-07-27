@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Pixels extends Canvas {
-	
+
 	/**
 	 * 
 	 */
@@ -14,12 +14,14 @@ public class Pixels extends Canvas {
 	private int width;
 	private Color black = new Color(0, 0, 0);
 	private Color white = new Color(255, 255, 255);
+	private Color[][] color;
 	private char[][] pixels;
 
-	public Pixels(int h, int w, char[][] px) {
+	public Pixels(int h, int w, char[][] px, Color[][] c) {
 		this.height = h;
 		this.width = w;
 		this.pixels = px;
+		this.color = c;
 	}
 
 	@Override
@@ -28,9 +30,10 @@ public class Pixels extends Canvas {
 
 		for (int x = 0; x < this.height; x++) {
 			for (int y = 0; y < this.width; y++) {
-				if (this.pixels[x][y] == 'B')
+				if (this.pixels[x][y] == 'B') {
+					// g.setColor(this.color[x][y]);
 					g.setColor(white);
-				else
+				} else
 					g.setColor(black);
 				g.drawLine(y, x, y, x);
 			}

@@ -1,5 +1,6 @@
 package malhaDeTriangulos;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,7 +24,7 @@ public class Malha {
 		String nomeArquivo;
 
 		/**
-		 * DEFININDO IMAGEM A SER LIDA NA HORA DA EXECUÇÃO
+		 * DEFININDO IMAGEM A SER LIDA NA HORA DA EXECUCAO
 		 */
 		System.out.println("NOME DO ARQUIVO: ");
 		nomeArquivo = arquivo.next();
@@ -36,7 +37,7 @@ public class Malha {
 		BufferedReader in = new BufferedReader(new FileReader(read));
 
 		/**
-		 * DEFINÇÃO DE LARGURA DA TELA NA HORA DA EXECUÇÃO
+		 * DEFINICAO DE LARGURA DA TELA NA HORA DA EXECUCAO
 		 */
 		// System.out.println("ALTURA: ");
 		// int H = arquivo.nextInt();
@@ -47,7 +48,7 @@ public class Malha {
 		/**
 		 * LARGURA DEFINIDA EM 320 X 320
 		 */
-		int H = 540;
+		int H = 600;
 		int W = 600;
 
 		String str = in.readLine();
@@ -141,7 +142,7 @@ public class Malha {
 			cv.setVetorN(Biblioteca.normalizacao(cv.getVetorN()));
 
 			/**
-			 * MATRIZ MUDANÇA DE BASE
+			 * MATRIZ MUDANCA DE BASE
 			 */
 			Matriz matMB = new Matriz(3, 3);
 			matMB.setMatrizLine(0, U);
@@ -151,7 +152,7 @@ public class Malha {
 			// matMB.print();
 
 			/**
-			 * PARA CADA TRIANGULO REALIZAR MUDANÇA MUNDIAL PARA VISTA
+			 * PARA CADA TRIANGULO REALIZAR MUDANCA MUNDIAL PARA VISTA
 			 */
 			Matriz pontos = new Matriz(nVertices, 3);
 			Matriz M;
@@ -173,7 +174,7 @@ public class Malha {
 			// pontos.print();
 
 			/**
-			 * PROJEÇÃO EM PERSPECTIVA
+			 * PROJECAO EM PERSPECTIVA
 			 */
 			Matriz projecao = new Matriz(nVertices, 2);
 
@@ -199,7 +200,9 @@ public class Malha {
 				coordTela.getMatriz()[i][1] = (int) (H - ((projecao.getMatriz()[i][1] + 1) / 2.0) * H + 0.5);
 			}
 
-			// coordTela.print();
+			//coordTela.print();
+
+			Color[][] color = new Color[H][W];
 
 			/**
 			 * PINTAR PIXELS DAS COORDENADAS DE TELA
@@ -217,21 +220,81 @@ public class Malha {
 			JFrame frame = new JFrame("Pixels Coordenadas de Tela");
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.setSize(H + 50, W + 50);
-			frame.add(new Pixels(H, W, tela));
+			frame.add(new Pixels(H, W, tela, new Color[H][W]));
 			frame.setLocationRelativeTo(null);
 			frame.setVisible(true);
-			
+
+			/**
+			 * 3ª PARTE DO PROJETO COMPUTAÇÃO GRÁFICA
+			 */
+
+			/**
+			 * CALCULAR NORMAL DE CADA TRIANGULO
+			 */
+			float[] vertex1;
+			float[] vertex2;
+			float[] vertex3;
+
+			Vetor[] normalTriangulo = new Vetor[kTriangulos];
+			for (int i = 0; i < kTriangulos; i++) {
+				vertex1 = coordTela.getMatriz()[indices[i][0] - 1];
+				vertex2 = coordTela.getMatriz()[indices[i][1] - 1];
+				vertex3 = coordTela.getMatriz()[indices[i][2] - 1];
+
+				Vetor v2v1 = Biblioteca.subPontos(new Ponto(vertex2[0], vertex2[1], 0, false),
+						new Ponto(vertex1[0], vertex1[1], 0, false));
+				Vetor v3v1 = Biblioteca.subPontos(new Ponto(vertex3[0], vertex3[1], 0, false),
+						new Ponto(vertex1[0], vertex1[1], 0, false));
+
+				normalTriangulo[i] = Biblioteca.normalizacao(Biblioteca.prodVetorial(v2v1, v3v1));
+
+			}
+
+			/**
+			 * CALCULAR NORMAL DE CADA VERTICE
+			 */
+			Vetor[] normalVertice = new Vetor[nVertices];
+			for (int vertex = 0; vertex < nVertices; vertex++) {
+				float[] somaNormal = new float[2];
+				for (int triangulo = 0; triangulo < kTriangulos; triangulo++) {
+					if ((vertex + 1) == indices[triangulo][0] || (vertex + 1) == indices[triangulo][1]
+							|| (vertex + 1) == indices[triangulo][2]) {
+						somaNormal[0] += normalTriangulo[triangulo].getX();
+						somaNormal[1] += normalTriangulo[triangulo].getY();
+					}
+				}
+				normalVertice[vertex] = new Vetor(somaNormal[0], somaNormal[1], 0);
+			}
+
+			/**
+			 * PREPARAR Z-BUFFER
+			 */
+			Ponto[] zBuffer = new Ponto[kTriangulos];
+
+			for (int i = 0; i < kTriangulos; i++) {
+				vertex1 = coordTela.getMatriz()[indices[i][0] - 1];
+				vertex2 = coordTela.getMatriz()[indices[i][1] - 1];
+				vertex3 = coordTela.getMatriz()[indices[i][2] - 1];
+
+				Ponto A = new Ponto(vertex1[0], vertex1[1], 0, false);
+				Ponto B = new Ponto(vertex2[0], vertex2[1], 0, false);
+				Ponto C = new Ponto(vertex3[0], vertex3[1], 0, false);
+
+				zBuffer[i] = Biblioteca.coordCartesiana(A, B, C, new Ponto(1 / 3, 1 / 3, 1 / 3, true));
+			}
+
 			/**
 			 * RASTERIZAR CADA TRIANGULO USANDO SCANLINE
 			 */
 
 			char[][] tela2 = new char[H][W];
-			Scanline.scanline(kTriangulos, coordTela, indices, tela2, W, H, cv);
+			Scanline.scanline(kTriangulos, coordTela, indices, tela2, W, H, cv, normalTriangulo, normalVertice,
+					zBuffer, pontos);
 
 			JFrame frame2 = new JFrame("Rasterização com Scanline");
 			frame2.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame2.setSize(H + 10, W + 10);
-			frame2.add(new Pixels(H, W, tela2));
+			frame2.add(new Pixels(H, W, tela2, new Color[H][W]));
 			frame2.setLocationRelativeTo(null);
 			frame2.setVisible(true);
 
