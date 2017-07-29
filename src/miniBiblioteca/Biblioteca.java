@@ -1,5 +1,7 @@
 package miniBiblioteca;
 
+import java.io.IOException;
+
 /**
  * MINI BIBLIOTECA DE FUNÇÕES MATEMÁTICAS
  * 
@@ -55,12 +57,12 @@ public class Biblioteca {
 	/**
 	 * PRODUTO VETORIAL DE DOIS VETORES 3D
 	 */
-	public static Vetor prodVetorial(Vetor u, Vetor v) {
+	public static Vetor prodVetorial(Vetor v, Vetor u) {
 		float x, y, z;
 
-		x = u.getY() * v.getZ() - (u.getZ() * v.getY());
-		y = u.getZ() * v.getX() - (u.getX() * v.getZ());
-		z = u.getX() * v.getY() - (u.getY() * v.getX());
+		x = v.getY() * u.getZ() - (v.getZ() * u.getY());
+		y = v.getZ() * u.getX() - (v.getX() * u.getZ());
+		z = v.getX() * u.getY() - (v.getY() * u.getX());
 
 		Vetor w = new Vetor(x, y, z);
 
@@ -93,24 +95,28 @@ public class Biblioteca {
 	/**
 	 * CALCULA COORDENADA BARICÊNTIRCA DE UM PONTO 2D COM RELAÇÃO A OUTROS TRÊS
 	 * PONTOS 2D NÃO-COLINEARES
+	 * @throws IOException 
 	 */
-	public static Ponto coordBaricentrica(Ponto P, Ponto A, Ponto B, Ponto C) {
+	public static Ponto coordBaricentrica(Ponto P, Ponto A, Ponto B, Ponto C) throws IOException {
 		float alpha, beta, gama;
 		float a, b, c, d, e, f;
 
-		// CALCULO DAS COORDENADAS DA MATRIZ QUE MULTIPLICA ALPHA E BETA
+		// CALCULO DAS COORDENADAS DA MATRIZ QUE MULTIPLICA ALPHA E BETA		
 		a = A.getX() - C.getX();
 		b = B.getX() - C.getX();
 		c = A.getY() - C.getY();
 		d = B.getY() - C.getY();
+		
 		e = P.getX() - C.getX();
 		f = P.getY() - C.getY();
 
 		// CALCULO DA TRANSPOSTA
-		a = 1 / (a * d - b * c) * d;
-		b = 1 / (a * d - b * c) * (-b);
-		c = 1 / (a * d - b * c) * (-c);
-		d = 1 / (a * d - b * c) * a;
+		float x = 1 / ((a * d) - (b * c));
+		
+		a = x * d;
+		b = x * (-b);
+		c = x * (-c);
+		d = x * a;
 
 		// CALCULO DE ALPHA, BETA E GAMA
 		alpha = a * e + b * f;
@@ -127,12 +133,13 @@ public class Biblioteca {
 	 * BARICÊNTRICA
 	 */
 	public static Ponto coordCartesiana(Ponto A, Ponto B, Ponto C, Ponto coord) {
-		float x, y;
+		float x, y, z;
 
 		x = coord.getX() * A.getX() + coord.getY() * B.getX() + coord.getZ() * C.getX();
 		y = coord.getX() * A.getY() + coord.getY() * B.getY() + coord.getZ() * C.getY();
+		z = coord.getX() * A.getZ() + coord.getY() * B.getZ() + coord.getZ() * C.getZ();
 
-		Ponto P = new Ponto(x, y, 0, false);
+		Ponto P = new Ponto(x, y, z, true);
 		return P;
 	}
 }

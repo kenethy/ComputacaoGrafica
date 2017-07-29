@@ -13,7 +13,6 @@ public class Pixels extends Canvas {
 	private int height;
 	private int width;
 	private Color black = new Color(0, 0, 0);
-	private Color white = new Color(255, 255, 255);
 	private Color[][] color;
 	private char[][] pixels;
 
@@ -31,8 +30,7 @@ public class Pixels extends Canvas {
 		for (int x = 0; x < this.height; x++) {
 			for (int y = 0; y < this.width; y++) {
 				if (this.pixels[x][y] == 'B') {
-					// g.setColor(this.color[x][y]);
-					g.setColor(white);
+					g.setColor(this.color[x][y]);
 				} else
 					g.setColor(black);
 				g.drawLine(y, x, y, x);

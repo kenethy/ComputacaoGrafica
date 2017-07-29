@@ -75,6 +75,7 @@ public class CameraVirtual {
 		values = str.split(" ");
 		this.Pl = new Ponto(Float.parseFloat(values[0]), Float.parseFloat(values[1]), Float.parseFloat(values[2]),
 				true);
+
 	}
 
 	public Ponto getPontoC() {
