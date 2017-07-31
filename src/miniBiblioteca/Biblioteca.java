@@ -111,16 +111,11 @@ public class Biblioteca {
 		f = P.getY() - C.getY();
 
 		// CALCULO DA TRANSPOSTA
-		float x = 1 / ((a * d) - (b * c));
+		float x = 1 / (a * d - b * c);
 		
-		a = x * d;
-		b = x * (-b);
-		c = x * (-c);
-		d = x * a;
-
 		// CALCULO DE ALPHA, BETA E GAMA
-		alpha = a * e + b * f;
-		beta = c * e + d * f;
+		alpha = (d * x * e) + (-b * x * f);
+		beta = (-c * x * e) + (a * x * f);
 		gama = 1 - alpha - beta;
 
 		Ponto coordenadaBaricentrica = new Ponto(alpha, beta, gama, true);

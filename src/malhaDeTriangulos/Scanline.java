@@ -2,7 +2,6 @@ package malhaDeTriangulos;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import miniBiblioteca.Biblioteca;
 import miniBiblioteca.Matriz;
@@ -12,7 +11,7 @@ import miniBiblioteca.Vetor;
 public class Scanline {
 
 	public static void scanline(int kTriangulos, Matriz coordTela, int[][] index, char[][] tela, int resolucaoX,
-			int resolucaoY, CameraVirtual cv, Vetor[] normalTriangulo, Vetor[] normalVertice, ArrayList<Ponto> zBuffer,
+			int resolucaoY, CameraVirtual cv, Vetor[] normalTriangulo, Vetor[] normalVertice, float[][] zBuffer,
 			Matriz pontos, Color[][] c) throws IOException {
 
 		float aMinimo, aMaximo;
@@ -23,23 +22,28 @@ public class Scanline {
 			/**
 			 * VERIFICAÇÃO DOS MAXIMOS E MINIMOS Y
 			 */
-			float[] vertexMaximo = coordTela.getMatriz()[index[i][0] - 1];
-			float[] vertexMedio = coordTela.getMatriz()[index[i][1] - 1];
-			float[] vertexMinimo = coordTela.getMatriz()[index[i][2] - 1];
+			float[] vertexMaximo = coordTela.getMatriz()[index[i][0]];
+			float[] vertexMedio = coordTela.getMatriz()[index[i][1]];
+			float[] vertexMinimo = coordTela.getMatriz()[index[i][2]];
+
+			Ponto A = new Ponto(vertexMaximo[0], vertexMaximo[1], cv.getD(), true);
+			Ponto B = new Ponto(vertexMedio[0], vertexMedio[1], cv.getD(), true);
+			Ponto C = new Ponto(vertexMinimo[0], vertexMinimo[1], cv.getD(), true);
 
 			/**
 			 * COMPARAÇÃO DE VERTICES PARA SABER QUAL É O MAIOR, MENOR E MÉDIO
 			 */
-			if (vertexMedio[1] < vertexMinimo[1]) {
-				float[] aux = vertexMedio;
-				vertexMedio = vertexMinimo;
-				vertexMinimo = aux;
-			}
 
 			if (vertexMaximo[1] < vertexMedio[1]) {
 				float[] aux = vertexMaximo;
 				vertexMaximo = vertexMedio;
 				vertexMedio = aux;
+			}
+
+			if (vertexMaximo[1] < vertexMinimo[1]) {
+				float[] aux = vertexMaximo;
+				vertexMaximo = vertexMinimo;
+				vertexMinimo = aux;
 			}
 
 			if (vertexMedio[1] < vertexMinimo[1]) {
@@ -55,10 +59,6 @@ public class Scanline {
 			vertexAux[0] = vertexMaximo[0] + ((vertexMedio[1] - vertexMaximo[1]) / (vertexMinimo[1] - vertexMaximo[1]))
 					* (vertexMinimo[0] - vertexMaximo[0]);
 			vertexAux[1] = vertexMedio[1];
-
-			Ponto A = new Ponto(vertexMaximo[0], vertexMaximo[1], cv.getD(), true);
-			Ponto B = new Ponto(vertexMedio[0], vertexMedio[1], cv.getD(), true);
-			Ponto D = new Ponto(vertexAux[0], vertexAux[1], cv.getD(), true);
 
 			/**
 			 * CALCULO DA CONSTANTE A DE INCREMENTO DO ANGULO DO TRIANGULO
@@ -76,30 +76,33 @@ public class Scanline {
 			 */
 			xMinimo = vertexMaximo[0];
 			xMaximo = xMinimo;
-			int yMaximo = (int) ((int) vertexMedio[1] + 0.5);
+			int yMaximo = (int) (vertexMedio[1] + 0.5);
 
 			/**
 			 * RASTERIZAÇÃO DO PRIMEIRO TRIANGULO
 			 */
-			for (int y = (int) ((int) vertexMaximo[1] + 0.5); y >= yMaximo; y--) {
+			for (int y = (int) (vertexMaximo[1] + 0.5); y >= yMaximo; y--) {
 
-				int xLeft = (int) ((int) xMinimo + 0.5);
-				int xRight = (int) ((int) xMaximo + 0.5);
+				int xLeft = (int) (xMinimo + 0.5);
+				int xRight = (int) (xMaximo + 0.5);
 
 				while (xLeft <= xRight) {
-					if (xLeft < 0 || xLeft >= resolucaoX || xLeft >= resolucaoY || xRight < 0 || xRight >= resolucaoX
-							|| xRight >= resolucaoY || y < 0 || y >= resolucaoX || y >= resolucaoY)
-						break;
-					/**
-					 * ENCONTRA P ORIGINAL
-					 */
-					Ponto p = new Ponto(xLeft, y, cv.getD(), true);
-					Ponto coordBaricentricas = Biblioteca.coordBaricentrica(p, A, B, D);
-					Vetor P = pOriginal(coordBaricentricas, index, i, pontos);
-					int yColor = (int) (y + 0.5);
-					int xColor = (int) (xLeft + 0.5);
-					color(cv, coordBaricentricas, pontos, index, i, normalVertice, c, yColor, xColor, P);
-					tela[(int) (y + 0.5)][(int) (xLeft + 0.5)] = 'B';
+					if (xLeft >= 0 && xLeft < resolucaoX && y >= 0 && y < resolucaoY) {
+						/**
+						 * ENCONTRA P ORIGINAL
+						 */
+						Ponto p = new Ponto(xLeft, y, cv.getD(), true);
+						Ponto coordBaricentricas = Biblioteca.coordBaricentrica(p, A, B, C);
+						Vetor P = pOriginal(coordBaricentricas, index, i, pontos);
+
+						if (P.getZ() < zBuffer[y][xLeft]) {
+							zBuffer[y][xLeft] = P.getZ();
+							int yColor = y;
+							int xColor = xLeft;
+							color(cv, coordBaricentricas, pontos, index, i, normalVertice, c, yColor, xColor, P);
+							tela[y][xLeft] = 'B';
+						}
+					}
 					xLeft++;
 				}
 
@@ -118,10 +121,6 @@ public class Scanline {
 				aMaximo = (vertexAux[1] - vertexMinimo[1]) / (vertexAux[0] - vertexMinimo[0]);
 			}
 
-			D = new Ponto(vertexAux[0], vertexAux[1], cv.getD(), true);
-			B = new Ponto(vertexMedio[0], vertexMedio[1], cv.getD(), true);
-			Ponto C = new Ponto(vertexMinimo[0], vertexMinimo[1], cv.getD(), true);
-
 			/**
 			 * INICIALIZAÇÃO DAS VARIAVEIS X_MINIMO E X_MAXIMO
 			 */
@@ -130,25 +129,28 @@ public class Scanline {
 			/**
 			 * RASTERIZAÇÃO DOS TRIANGULOS DE CIMA PARA BAIXO
 			 */
-			for (int y = (int) ((int) vertexMinimo[1] + 0.5); y < yMaximo; y++) {
+			for (int y = (int) (vertexMinimo[1] + 0.5); y < yMaximo; y++) {
 
-				int xLeft = (int) ((int) xMinimo + 0.5);
-				int xRight = (int) ((int) xMaximo + 0.5);
+				int xLeft = (int) (xMinimo + 0.5);
+				int xRight = (int) (xMaximo + 0.5);
 
 				while (xLeft <= xRight) {
-					if (xLeft < 0 || xLeft >= resolucaoX || xLeft >= resolucaoY || xRight < 0 || xRight >= resolucaoX
-							|| xRight >= resolucaoY || y < 0 || y >= resolucaoX || y >= resolucaoY)
-						break;
-					/**
-					 * ENCONTRA P ORIGINAL
-					 */
-					Ponto p = new Ponto(xLeft, y, cv.getD(), true);
-					Ponto coordBaricentricas = Biblioteca.coordBaricentrica(p, D, B, C);
-					Vetor P = pOriginal(coordBaricentricas, index, i, pontos);
-					int yColor = (int) (y + 0.5);
-					int xColor = (int) (xLeft + 0.5);
-					color(cv, coordBaricentricas, pontos, index, i, normalVertice, c, yColor, xColor, P);
-					tela[(int) (y + 0.5)][(int) (xLeft + 0.5)] = 'B';
+					if (xLeft >= 0 && xLeft < resolucaoX && y >= 0 && y < resolucaoY) {
+						/**
+						 * ENCONTRA P ORIGINAL
+						 */
+						Ponto p = new Ponto(xLeft, y, cv.getD(), true);
+						Ponto coordBaricentricas = Biblioteca.coordBaricentrica(p, A, B, C);
+						Vetor P = pOriginal(coordBaricentricas, index, i, pontos);
+
+						if (P.getZ() < zBuffer[y][xLeft]) {
+							zBuffer[y][xLeft] = P.getZ();
+							int yColor = y;
+							int xColor = xLeft;
+							color(cv, coordBaricentricas, pontos, index, i, normalVertice, c, yColor, xColor, P);
+							tela[y][xLeft] = 'B';
+						}
+					}
 					xLeft++;
 				}
 
@@ -159,17 +161,17 @@ public class Scanline {
 	}
 
 	public static Vetor pOriginal(Ponto coordBaricentricas, int[][] index, int i, Matriz pontos) {
-		float P1x = coordBaricentricas.getX() * pontos.getMatriz()[index[i][0] - 1][0];
-		float P1y = coordBaricentricas.getX() * pontos.getMatriz()[index[i][0] - 1][1];
-		float P1z = coordBaricentricas.getX() * pontos.getMatriz()[index[i][0] - 1][2];
+		float P1x = coordBaricentricas.getX() * pontos.getMatriz()[index[i][0]][0];
+		float P1y = coordBaricentricas.getX() * pontos.getMatriz()[index[i][0]][1];
+		float P1z = coordBaricentricas.getX() * pontos.getMatriz()[index[i][0]][2];
 
-		float P2x = coordBaricentricas.getY() * pontos.getMatriz()[index[i][1] - 1][0];
-		float P2y = coordBaricentricas.getY() * pontos.getMatriz()[index[i][1] - 1][1];
-		float P2z = coordBaricentricas.getY() * pontos.getMatriz()[index[i][1] - 1][2];
+		float P2x = coordBaricentricas.getY() * pontos.getMatriz()[index[i][1]][0];
+		float P2y = coordBaricentricas.getY() * pontos.getMatriz()[index[i][1]][1];
+		float P2z = coordBaricentricas.getY() * pontos.getMatriz()[index[i][1]][2];
 
-		float P3x = coordBaricentricas.getZ() * pontos.getMatriz()[index[i][2] - 1][0];
-		float P3y = coordBaricentricas.getZ() * pontos.getMatriz()[index[i][2] - 1][1];
-		float P3z = coordBaricentricas.getZ() * pontos.getMatriz()[index[i][2] - 1][2];
+		float P3x = coordBaricentricas.getZ() * pontos.getMatriz()[index[i][2]][0];
+		float P3y = coordBaricentricas.getZ() * pontos.getMatriz()[index[i][2]][1];
+		float P3z = coordBaricentricas.getZ() * pontos.getMatriz()[index[i][2]][2];
 
 		P1x = P1x + P2x + P3x;
 		P1y = P1y + P2y + P3y;
@@ -186,17 +188,17 @@ public class Scanline {
 		/**
 		 * ENCONTRA N NORMAL DE P, NORMALIZA N
 		 */
-		float N1x = coordBaricentricas.getX() * normalVertice[index[i][0] - 1].getX();
-		float N1y = coordBaricentricas.getX() * normalVertice[index[i][0] - 1].getY();
-		float N1z = coordBaricentricas.getX() * normalVertice[index[i][0] - 1].getZ();
+		float N1x = coordBaricentricas.getX() * normalVertice[index[i][0]].getX();
+		float N1y = coordBaricentricas.getX() * normalVertice[index[i][0]].getY();
+		float N1z = coordBaricentricas.getX() * normalVertice[index[i][0]].getZ();
 
-		float N2x = coordBaricentricas.getY() * normalVertice[index[i][1] - 1].getX();
-		float N2y = coordBaricentricas.getY() * normalVertice[index[i][1] - 1].getY();
-		float N2z = coordBaricentricas.getY() * normalVertice[index[i][1] - 1].getZ();
+		float N2x = coordBaricentricas.getY() * normalVertice[index[i][1]].getX();
+		float N2y = coordBaricentricas.getY() * normalVertice[index[i][1]].getY();
+		float N2z = coordBaricentricas.getY() * normalVertice[index[i][1]].getZ();
 
-		float N3x = coordBaricentricas.getZ() * normalVertice[index[i][2] - 1].getX();
-		float N3y = coordBaricentricas.getZ() * normalVertice[index[i][2] - 1].getY();
-		float N3z = coordBaricentricas.getZ() * normalVertice[index[i][2] - 1].getZ();
+		float N3x = coordBaricentricas.getZ() * normalVertice[index[i][2]].getX();
+		float N3y = coordBaricentricas.getZ() * normalVertice[index[i][2]].getY();
+		float N3z = coordBaricentricas.getZ() * normalVertice[index[i][2]].getZ();
 
 		N1x = N1x + N2x + N3x;
 		N1y = N1y + N2y + N3y;

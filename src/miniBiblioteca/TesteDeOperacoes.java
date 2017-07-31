@@ -10,6 +10,7 @@ public class TesteDeOperacoes {
 	public static void main(String[] args) throws IOException {
 
 		File read = new File("testeDeOperacoes.txt");
+		@SuppressWarnings("resource")
 		BufferedReader in = new BufferedReader(new FileReader(read));
 
 		// MULTIPLICAÇÃO DE MATRIZES

@@ -42,6 +42,8 @@ public class CameraVirtual {
 		this.setEscalarD(Float.parseFloat(values[0]));
 		this.setEscalarHx(Float.parseFloat(values[1]));
 		this.setEscalarHy(Float.parseFloat(values[2]));
+		
+		str = in.readLine();
 
 		str = in.readLine();
 		values = str.split(" ");

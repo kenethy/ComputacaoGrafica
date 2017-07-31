@@ -5,8 +5,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
@@ -79,7 +77,7 @@ public class Malha {
 			str = in.readLine();
 			values = str.split(" ");
 			for (int j = 0; j < 3; j++)
-				indices[i][j] = Integer.parseInt(values[j]);
+				indices[i][j] = Integer.parseInt(values[j]) - 1;
 		}
 
 		for (int i = 0; i < coordenadas.length; i++) {
@@ -101,9 +99,9 @@ public class Malha {
 
 		for (int i = 0; i < coordNorm.length; i++) {
 			for (int j = 0; j < coordNorm[i].length; j++) {
-				coordNorm[i][j] = ((coordenadas[i][j] - xMin) / (xMax - xMin)) * (W - 1);
+				coordNorm[i][j] = ((coordenadas[i][j] - xMin) / (xMax - xMin)) * (H - 1);
 				j++;
-				coordNorm[i][j] = ((coordenadas[i][j] - yMin) / (yMax - yMin)) * (H - 1);
+				coordNorm[i][j] = ((coordenadas[i][j] - yMin) / (yMax - yMin)) * (W - 1);
 			}
 		}
 
@@ -208,8 +206,7 @@ public class Malha {
 			/**
 			 * PINTAR PIXELS DAS COORDENADAS DE TELA
 			 */
-			
-			/**
+
 			for (int i = 0; i < H; i++) {
 				for (int j = 0; j < W; j++) {
 					for (int k = 0; k < nVertices; k++) {
@@ -219,21 +216,20 @@ public class Malha {
 					}
 				}
 			}
-
-			Color[][] color1 = new Color[H][W];
-
-			for (int i = 0; i < H; i++) {
-				for (int j = 0; j < W; j++) {
-					color1[i][j] = Color.white;
-				}
-			}
-
-			JFrame frame = new JFrame("Pixels Coordenadas de Tela");
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			frame.setSize(H + 50, W + 50);
-			frame.add(new Pixels(H, W, tela, color1));
-			frame.setLocationRelativeTo(null);
-			frame.setVisible(true);
+			// Color[][] color1 = new Color[H][W];
+			//
+			// for (int i = 0; i < H; i++) {
+			// for (int j = 0; j < W; j++) {
+			// color1[i][j] = Color.white;
+			// }
+			// }
+			//
+			// JFrame frame = new JFrame("Pixels Coordenadas de Tela");
+			// frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			// frame.setSize(H + 50, W + 50);
+			// frame.add(new Pixels(H, W, tela, color1));
+			// frame.setLocationRelativeTo(null);
+			// frame.setVisible(true);
 
 			/**
 			 * 3ª PARTE DO PROJETO COMPUTAÇÃO GRÁFICA
@@ -248,9 +244,9 @@ public class Malha {
 
 			Vetor[] normalTriangulo = new Vetor[kTriangulos];
 			for (int i = 0; i < kTriangulos; i++) {
-				vertex1 = pontos.getMatriz()[indices[i][0] - 1];
-				vertex2 = pontos.getMatriz()[indices[i][1] - 1];
-				vertex3 = pontos.getMatriz()[indices[i][2] - 1];
+				vertex1 = pontos.getMatriz()[indices[i][0]];
+				vertex2 = pontos.getMatriz()[indices[i][1]];
+				vertex3 = pontos.getMatriz()[indices[i][2]];
 
 				Vetor v2v1 = Biblioteca.subPontos(new Ponto(vertex2[0], vertex2[1], vertex2[2], true),
 						new Ponto(vertex1[0], vertex1[1], vertex1[2], true));
@@ -261,6 +257,7 @@ public class Malha {
 				normalTriangulo[i] = Biblioteca.normalizacao(Biblioteca.prodVetorial(v2v1, v3v1));
 			}
 
+			// System.out.println("TRIANGULO");
 			// for (int vertex = 0; vertex < kTriangulos; vertex++) {
 			// normalTriangulo[vertex].print();
 			// }
@@ -274,8 +271,8 @@ public class Malha {
 				somaNormal[0] = somaNormal[1] = somaNormal[2] = 0;
 				for (int triangulo = 0; triangulo < kTriangulos; triangulo++) {
 
-					if ((vertex + 1) == indices[triangulo][0] || (vertex + 1) == indices[triangulo][1]
-							|| (vertex + 1) == indices[triangulo][2]) {
+					if ((vertex) == indices[triangulo][0] || (vertex) == indices[triangulo][1]
+							|| (vertex) == indices[triangulo][2]) {
 						somaNormal[0] += normalTriangulo[triangulo].getX();
 						somaNormal[1] += normalTriangulo[triangulo].getY();
 						somaNormal[2] += normalTriangulo[triangulo].getZ();
@@ -284,6 +281,7 @@ public class Malha {
 				normalVertice[vertex] = Biblioteca.normalizacao(new Vetor(somaNormal[0], somaNormal[1], somaNormal[2]));
 			}
 
+			// System.out.println("VERTICE");
 			// for (int vertex = 0; vertex < nVertices; vertex++) {
 			// normalVertice[vertex].print();
 			// }
@@ -291,26 +289,17 @@ public class Malha {
 			/**
 			 * PREPARAR Z-BUFFER
 			 */
-			ArrayList<Ponto> zBuffer = new ArrayList<Ponto>();
 
-			for (int i = 0; i < kTriangulos; i++) {
-				vertex1 = pontos.getMatriz()[indices[i][0] - 1];
-				vertex2 = pontos.getMatriz()[indices[i][1] - 1];
-				vertex3 = pontos.getMatriz()[indices[i][2] - 1];
-				
-				float x = (vertex1[0] + vertex2[0] + vertex3[0]) / 3;
-				float y = (vertex1[1] + vertex2[1] + vertex3[1]) / 3;
-				float z = (vertex1[2] + vertex2[2] + vertex3[2]) / 3;
-				
-				zBuffer.add(new Ponto(x, y, z, true));
+			float[][] zBuffer = new float[H][W];
+
+			for (int i = 0; i < zBuffer.length; i++) {
+				for (int j = 0; j < zBuffer[i].length; j++)
+					zBuffer[i][j] = Float.MIN_VALUE;
 			}
-			
-			Collections.sort(zBuffer, new ZBuffer());
-			
+
 			/**
 			 * RASTERIZAR CADA TRIANGULO USANDO SCANLINE
 			 */
-
 			Color[][] color = new Color[H][W];
 			for (int i = 0; i < H; i++)
 				for (int j = 0; j < W; j++)

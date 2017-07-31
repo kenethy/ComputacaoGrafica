@@ -27,13 +27,13 @@ public class Pixels extends Canvas {
 	public void paint(Graphics g) {
 		super.paint(g);
 
-		for (int x = 0; x < this.height; x++) {
-			for (int y = 0; y < this.width; y++) {
-				if (this.pixels[x][y] == 'B') {
-					g.setColor(this.color[x][y]);
+		for (int y = 0; y < this.height; y++) {
+			for (int x = 0; x < this.width; x++) {
+				if (this.pixels[y][x] == 'B') {
+					g.setColor(this.color[y][x]);
 				} else
 					g.setColor(black);
-				g.drawLine(y, x, y, x);
+				g.drawLine(x, y, x, y);
 			}
 		}
 	}
