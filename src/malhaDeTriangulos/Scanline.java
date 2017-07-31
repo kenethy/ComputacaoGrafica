@@ -153,7 +153,6 @@ public class Scanline {
 					}
 					xLeft++;
 				}
-
 				xMinimo += (1.0 / aMinimo);
 				xMaximo += (1.0 / aMaximo);
 			}

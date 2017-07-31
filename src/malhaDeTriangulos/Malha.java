@@ -294,7 +294,7 @@ public class Malha {
 
 			for (int i = 0; i < zBuffer.length; i++) {
 				for (int j = 0; j < zBuffer[i].length; j++)
-					zBuffer[i][j] = Float.MIN_VALUE;
+					zBuffer[i][j] = Float.MAX_VALUE;
 			}
 
 			/**
