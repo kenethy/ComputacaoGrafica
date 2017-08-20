@@ -160,8 +160,8 @@ public class Malha {
 
 			for (int i = 0; i < nVertices; i++) {
 				Matriz p = new Matriz(3, 1);
-				Vetor vetorP = Biblioteca.subPontos(
-						new Ponto(coordenadas[i][0], coordenadas[i][1], coordenadas[i][2], true), cv.getPontoC());
+				Vetor vetorP = Biblioteca.subPontos(cv.getPontoC(),
+						new Ponto(coordenadas[i][0], coordenadas[i][1], coordenadas[i][2], true));
 
 				p.getMatriz()[0][0] = vetorP.getX();
 				p.getMatriz()[1][0] = vetorP.getY();
